@@ -236,7 +236,7 @@ if __name__ == "__main__":
     path1 = "data/dolphins.gml"  # 61个节点
     path2 = "data/polbooks.gml"  # 104个节点
     path3 = "data/football.gml"  # 114个节点
-    path4 = "data/polblogs.gml"  # 1490个节点
+    path4 = "data/netscience.gml"  # 1588个节点
 
     path5 = "data/benchmark/network.dat"  # 1490个节点
 

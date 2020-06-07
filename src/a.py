@@ -39,7 +39,7 @@ def NMI(A,B):
     return MIhat
 
 if __name__ == '__main__':
-    A = np.array([1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3])
-    B = np.array([1,2,1,1,1,1,1,2,2,2,2,3,1,1,3,3,3])
+    A = np.array([[0, 1, 5,3,4,8,9],[1,2,3,5,4], [1, 2, 3, 4, 7, 8],[10,11,12,13,14,15]])
+    B = np.array([[10,11,12,13,14,15],[0, 1, 2, 3, 4, 5, 7, 8], [0,9,6, 5]])
     print(NMI(A,B))
     print(metrics.normalized_mutual_info_score(A,B))
