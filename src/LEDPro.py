@@ -115,13 +115,13 @@ def Bl(graph, Nr, U):
         if un_sum == 0:
             B = 0
         else:
-            B = and_sum / un_sum
+            B = (and_sum + len(and_set)) / (un_sum + len(un_set))
             Decimal(B).quantize(Decimal("0.000"))
         Bl[i] = B
 
     Bl = sorted(Bl.items(), key=lambda e: e[1], reverse=True)
-    print("Bl的长度=",len(Bl))
-    return Bl
+    Bl_u = Bl.pop(0)
+    return Bl_u
 
 
 def LEDocnetPro(graph):
@@ -155,23 +155,21 @@ def LEDocnetPro(graph):
         # 去重
         format_U = list(set(U))
         format_U.sort(key=U.index)
-        print("format_U的长度=",len(format_U))
 
-        # 计算隶属度，并选择隶属度最大的节点加入初始社区
-        Bl_list = Bl(graph, Nr, format_U)
-
-        while Bl_list != []:
-            Bl_u = Bl_list.pop(0)
+        while format_U != []:
+            # 计算隶属度，并选择隶属度最大的节点加入初始社区
+            Bl_u = Bl(graph, Nr, format_U)
             Nr_old = Nr
             Nr.append(Bl_u[0])
 
             if CQ(Nr) > CQ(Nr_old):
                 C.append(Bl_u[0])
-            # else:
-            #     # 论文中阐述如果隶属度最大的点不具备加入初始社区的条件则不对其余节点进行计算
-            #     # 此处循环各个节点
-            #     # Nr.remove(Bl_u[0])
-            #     format_U.remove(Bl_u[0])
+                format_U.remove(Bl_u[0])
+            else:
+                # 论文中阐述如果隶属度最大的点不具备加入初始社区的条件则不对其余节点进行计算
+                # 此处循环各个节点
+                # Nr.remove(Bl_u[0])
+                format_U.remove(Bl_u[0])
 
         print(temp, "次C=", C)
 
@@ -192,7 +190,7 @@ def LEDocnetPro(graph):
 
 if __name__ == "__main__":
     time_start = time.process_time()
-    path0 = "data/karate.gml"    # 34个节点
+    path0 = "data/karate.gml"  # 34个节点
     path1 = "data/dolphins.gml"  # 61个节点
     path2 = "data/polbooks.gml"  # 104个节点
     path3 = "data/football.gml"  # 114个节点
