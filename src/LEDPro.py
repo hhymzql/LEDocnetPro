@@ -120,8 +120,8 @@ def Bl(graph, Nr, U):
         Bl[i] = B
 
     Bl = sorted(Bl.items(), key=lambda e: e[1], reverse=True)
-    Bl_u = Bl.pop(0)
-    return Bl_u
+    print("Bl的长度=",len(Bl))
+    return Bl
 
 
 def LEDocnetPro(graph):
@@ -155,21 +155,23 @@ def LEDocnetPro(graph):
         # 去重
         format_U = list(set(U))
         format_U.sort(key=U.index)
+        print("format_U的长度=",len(format_U))
 
-        while format_U != []:
-            # 计算隶属度，并选择隶属度最大的节点加入初始社区
-            Bl_u = Bl(graph, Nr, format_U)
+        # 计算隶属度，并选择隶属度最大的节点加入初始社区
+        Bl_list = Bl(graph, Nr, format_U)
+
+        while Bl_list != []:
+            Bl_u = Bl_list.pop(0)
             Nr_old = Nr
             Nr.append(Bl_u[0])
 
             if CQ(Nr) > CQ(Nr_old):
                 C.append(Bl_u[0])
-                format_U.remove(Bl_u[0])
-            else:
-                # 论文中阐述如果隶属度最大的点不具备加入初始社区的条件则不对其余节点进行计算
-                # 此处循环各个节点
-                # Nr.remove(Bl_u[0])
-                format_U.remove(Bl_u[0])
+            # else:
+            #     # 论文中阐述如果隶属度最大的点不具备加入初始社区的条件则不对其余节点进行计算
+            #     # 此处循环各个节点
+            #     # Nr.remove(Bl_u[0])
+            #     format_U.remove(Bl_u[0])
 
         print(temp, "次C=", C)
 
@@ -197,8 +199,8 @@ if __name__ == "__main__":
     path4 = "data/netscience.gml"  # 1490个节点
     path5 = "data/benchmark/network.dat"  # 人工生成网络
 
-    # graph = nx.read_gml(path0)
-    graph = nx.read_adjlist(path5)
+    graph = nx.read_gml(path0)
+    # graph = nx.read_adjlist(path5)
     nodes = graph.nodes()
 
     node_num = graph.number_of_nodes()  # 节点数
@@ -211,15 +213,15 @@ if __name__ == "__main__":
     Communities = LEDocnetPro(graph)
 
     print("社区评价标准：")
-    # print("模块度Q = ", evaluation.Modularity(Communities, edge_num, degrees, edges))
-    # print("改进模块度EQ = ", evaluation.ExtendQ(Communities, edge_num, degrees, edges))
-    # print("Qov=", evaluation.Qov(Communities, nodes, edge_num, degrees, edges))
+    print("模块度Q = ", evaluation.Modularity(Communities, edge_num, degrees, edges))
+    print("改进模块度EQ = ", evaluation.ExtendQ(Communities, edge_num, degrees, edges))
+    print("Qov=", evaluation.Qov(Communities, nodes, edge_num, degrees, edges))
 
-    # benchmark生成网络的节点所属社区列表
-    bench = dd.trans("data/benchmark/community.dat")
-    # 社区评价公式（还未解决图邻接矩阵索引必须是整数的问题）
-    print(bench)
-    print("NMI=",nmi.calc_overlap_nmi(node_num,Communities,bench))
+    # # benchmark生成网络的节点所属社区列表
+    # bench = dd.trans("data/benchmark/community.dat")
+    # # 社区评价公式（还未解决图邻接矩阵索引必须是整数的问题）
+    # print(bench)
+    # print("NMI=",nmi.calc_overlap_nmi(node_num,Communities,bench))
     # print("NMI=",metrics.normalized_mutual_info_score(bench, Communities_to_list))
 
     time_end = time.process_time()
