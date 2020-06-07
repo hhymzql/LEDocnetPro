@@ -123,7 +123,6 @@ def Bl(graph, Nr, U):
     Bl_u = Bl.pop(0)
     return Bl_u
 
-
 def LEDocnetPro(graph):
     '''
     :param graph: 输入的图
