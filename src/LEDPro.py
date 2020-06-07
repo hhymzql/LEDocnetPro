@@ -197,7 +197,7 @@ if __name__ == "__main__":
     path4 = "data/netscience.gml"  # 1490个节点
     path5 = "data/benchmark/network.dat"  # 人工生成网络
 
-    graph = nx.read_gml(path0)
+    graph = nx.read_gml(path3)
     # graph = nx.read_adjlist(path5)
     nodes = graph.nodes()
 
