@@ -212,7 +212,7 @@ if __name__ == "__main__":
     # 执行社区发现算法
     Communities = LEDocnetPro(graph)
     # 将社区划分结果转换成类似community.dat格式的TXT文件，方便Qov计算
-    # dd.transListToDat(Communities)
+    dd.transListToDat(Communities)
 
     print("社区评价标准：")
     print("模块度Q = ", evaluation.Modularity(Communities, edge_num, degrees, edges))
