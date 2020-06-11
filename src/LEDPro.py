@@ -7,6 +7,7 @@ from sklearn import metrics
 from evaluation_metric import evaluation
 from evaluation_metric import nmi
 import data_deal as dd
+import copy
 
 
 def leaderrank(graph):
@@ -80,13 +81,14 @@ def CQ(C):
     C_in = 0.0
     C_out = 0.0
     for node in C:
-        for i in graph.neighbors(node):
+        nodes = graph.neighbors(node)
+        for i in nodes:
             if i in C:
                 C_in += 1
             else:
                 C_out += 1
     C_in = C_in / 2
-    score = C_in / math.sqrt(pow(C_out, 2) + pow(C_in, 2))
+    score = (C_in - C_out) / (C_out + C_in)
     return score
 
 
@@ -115,13 +117,13 @@ def Bl(graph, Nr, U):
         if un_sum == 0:
             B = 0
         else:
-            B = (and_sum + len(and_set)) / (un_sum + len(un_set))
+            B = and_sum / un_sum * len(un_set) / len(and_set)
             Decimal(B).quantize(Decimal("0.000"))
         Bl[i] = B
 
-    Bl = sorted(Bl.items(), key=lambda e: e[1], reverse=True)
-    Bl_u = Bl.pop(0)
-    return Bl_u
+    Blu = sorted(Bl.items(), key=lambda e: e[1], reverse=True)
+    return Blu
+
 
 def LEDocnetPro(graph):
     '''
@@ -142,7 +144,7 @@ def LEDocnetPro(graph):
         C = list(graph.neighbors(c[0]))
         C.append(c[0])
         print("初始社区：", temp, "次", C)
-        Nr = C
+        Nr = copy.deepcopy(C)
 
         # 获取初始社区中节点的不在初始社区的邻节点
         U = []
@@ -155,20 +157,21 @@ def LEDocnetPro(graph):
         format_U = list(set(U))
         format_U.sort(key=U.index)
 
-        while format_U != []:
-            # 计算隶属度，并选择隶属度最大的节点加入初始社区
-            Bl_u = Bl(graph, Nr, format_U)
-            Nr_old = Nr
-            Nr.append(Bl_u[0])
+        # 计算隶属度，并选择隶属度最大的节点加入初始社区
+        Bl_u = Bl(graph, Nr, format_U)
 
-            if CQ(Nr) > CQ(Nr_old):
-                C.append(Bl_u[0])
-                format_U.remove(Bl_u[0])
-            else:
-                # 论文中阐述如果隶属度最大的点不具备加入初始社区的条件则不对其余节点进行计算
-                # 此处循环各个节点
-                # Nr.remove(Bl_u[0])
-                format_U.remove(Bl_u[0])
+        while Bl_u != []:
+            Bl_first = Bl_u.pop(0)
+            Nr_new = copy.deepcopy(Nr)
+            Nr_new.append(Bl_first[0])
+
+            if CQ(Nr_new) > CQ(Nr):
+                C.append(Bl_first[0])
+            # else:
+            #     # 论文中阐述如果隶属度最大的点不具备加入初始社区的条件则不对其余节点进行计算
+            #     # 此处循环各个节点
+            #     # Nr.remove(Bl_u[0])
+            #     format_U.remove(Bl_u[0])
 
         print(temp, "次C=", C)
 
@@ -196,7 +199,7 @@ if __name__ == "__main__":
     path4 = "data/netscience.gml"  # 1490个节点
     path5 = "data/benchmark/network.dat"  # 人工生成网络
 
-    graph = nx.read_gml(path3)
+    graph = nx.read_gml(path4)
     # graph = nx.read_adjlist(path5)
     nodes = graph.nodes()
 
@@ -208,6 +211,8 @@ if __name__ == "__main__":
 
     # 执行社区发现算法
     Communities = LEDocnetPro(graph)
+    # 将社区划分结果转换成类似community.dat格式的TXT文件，方便Qov计算
+    # dd.transListToDat(Communities)
 
     print("社区评价标准：")
     print("模块度Q = ", evaluation.Modularity(Communities, edge_num, degrees, edges))
@@ -215,7 +220,7 @@ if __name__ == "__main__":
     print("Qov=", evaluation.Qov(Communities, nodes, edge_num, degrees, edges))
 
     # # benchmark生成网络的节点所属社区列表
-    # bench = dd.trans("data/benchmark/community.dat")
+    # bench = dd.transDatToList("data/benchmark/community.dat")
     # # 社区评价公式（还未解决图邻接矩阵索引必须是整数的问题）
     # print(bench)
     # print("NMI=",nmi.calc_overlap_nmi(node_num,Communities,bench))

@@ -1,5 +1,5 @@
 # coding:utf-8
-def trans(path):
+def transDatToList(path):
     content = open(path, "r", encoding="utf-8").readlines()
     communities = {}
     for line in content:
@@ -11,6 +11,9 @@ def trans(path):
                 communities[community] = [node]
             else:
                 communities[community].append(node)
-    print(communities)
+    return list(communities.values())
+
+
+
 if __name__ == "__main__":
-    trans("data/benchmark/community.dat")
+    transDatToList("data/benchmark/community.dat")
