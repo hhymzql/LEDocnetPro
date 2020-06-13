@@ -186,7 +186,6 @@ def LEDocnetPro(graph):
                 del cfc_node_list[i]
         cfc_node_list = list(cfc_node_list.items())
         print(temp, "次collection_list=", cfc_node_list)
-
     return P
 
 
@@ -199,7 +198,7 @@ if __name__ == "__main__":
     path4 = "data/netscience.gml"  # 1490个节点
     path5 = "data/benchmark/network.dat"  # 人工生成网络
 
-    graph = nx.read_gml(path4)
+    graph = nx.read_gml(path2)
     # graph = nx.read_adjlist(path5)
     nodes = graph.nodes()
 
@@ -212,12 +211,12 @@ if __name__ == "__main__":
     # 执行社区发现算法
     Communities = LEDocnetPro(graph)
     # 将社区划分结果转换成类似community.dat格式的TXT文件，方便Qov计算
-    dd.transListToDat(Communities)
+    # dd.transListToDat(Communities)
 
     print("社区评价标准：")
     print("模块度Q = ", evaluation.Modularity(Communities, edge_num, degrees, edges))
     print("改进模块度EQ = ", evaluation.ExtendQ(Communities, edge_num, degrees, edges))
-    print("Qov=", evaluation.Qov(Communities, nodes, edge_num, degrees, edges))
+    print("Qov=", evaluation.Qov_adv(Communities, nodes, node_num, edge_num, degrees, A))
 
     # # benchmark生成网络的节点所属社区列表
     # bench = dd.transDatToList("data/benchmark/community.dat")
