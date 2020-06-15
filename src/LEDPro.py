@@ -186,45 +186,50 @@ def LEDocnetPro(graph):
                 del cfc_node_list[i]
         cfc_node_list = list(cfc_node_list.items())
         print(temp, "次collection_list=", cfc_node_list)
-
     return P
 
 
 if __name__ == "__main__":
     time_start = time.process_time()
-    path0 = "data/karate.gml"  # 34个节点
-    path1 = "data/dolphins.gml"  # 61个节点
-    path2 = "data/polbooks.gml"  # 104个节点
-    path3 = "data/football.gml"  # 114个节点
-    path4 = "data/netscience.gml"  # 1490个节点
+    path0 = "data/RealNet/karate.gml"  # 34个节点
+    path1 = "data/RealNet/dolphins.gml"  # 61个节点
+    path2 = "data/RealNet/polbooks.gml"  # 104个节点
+    path3 = "data/RealNet/football.gml"  # 114个节点
+    path4 = "data/RealNet/netscience.gml"  # 1490个节点
     path5 = "data/benchmark/network.dat"  # 人工生成网络
 
-    graph = nx.read_gml(path4)
-    # graph = nx.read_adjlist(path5)
+    graph = nx.read_gml(path2)
     nodes = graph.nodes()
-
     node_num = graph.number_of_nodes()  # 节点数
     edge_num = graph.number_of_edges()  # 边数
     degrees = dict(graph.degree(graph))  # 各节点度数 {'1': 16,'2': 9, '3': 10...}
     edges = graph.edges()  # 边对 [('1','2'),('1','3'),....]
     A = np.array(nx.adjacency_matrix(graph).todense())  # 获取图邻接矩阵
-
     # 执行社区发现算法
     Communities = LEDocnetPro(graph)
-    # 将社区划分结果转换成类似community.dat格式的TXT文件，方便Qov计算
-    dd.transListToDat(Communities)
-
     print("社区评价标准：")
     print("模块度Q = ", evaluation.Modularity(Communities, edge_num, degrees, edges))
     print("改进模块度EQ = ", evaluation.ExtendQ(Communities, edge_num, degrees, edges))
-    print("Qov=", evaluation.Qov(Communities, nodes, edge_num, degrees, edges))
+    print("Qov=", evaluation.Qov_adv(Communities, nodes, node_num, edge_num, degrees, A))
 
-    # # benchmark生成网络的节点所属社区列表
-    # bench = dd.transDatToList("data/benchmark/community.dat")
-    # # 社区评价公式（还未解决图邻接矩阵索引必须是整数的问题）
-    # print(bench)
-    # print("NMI=",nmi.calc_overlap_nmi(node_num,Communities,bench))
-    # print("NMI=",metrics.normalized_mutual_info_score(bench, Communities_to_list))
+    # path6 = ""
+    # path7 = ""
+    # for i in range(9):
+    #     path6 = "data\GNBenchmark\communityGN" + str(i + 1) + ".dat"
+    #     path7 = "data\GNBenchmark\\networkGN" + str(i + 1) + ".dat"
+    #     graph = nx.read_adjlist(path7)
+    #     nodes = graph.nodes()
+    #     node_num = graph.number_of_nodes()  # 节点数
+    #     edge_num = graph.number_of_edges()  # 边数
+    #     degrees = dict(graph.degree(graph))  # 各节点度数 {'1': 16,'2': 9, '3': 10...}
+    #     edges = graph.edges()  # 边对 [('1','2'),('1','3'),....]
+    #     A = np.array(nx.adjacency_matrix(graph).todense())  # 获取图邻接矩阵
+    #
+    #     Communities = LEDocnetPro(graph)
+    #     # benchmark生成网络的节点所属社区列表
+    #     bench = dd.transDatToList(path6)
+    #     # 社区评价公式（还未解决图邻接矩阵索引必须是整数的问题）
+    #     print("NMI" + str(i) + "=", nmi.calc_overlap_nmi(node_num, Communities, bench))
 
     time_end = time.process_time()
     print("time:", time_end - time_start)
