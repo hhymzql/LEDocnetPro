@@ -30,13 +30,17 @@ def leaderrank(graph):
     # 迭代从而满足停止条件
     while True:
         tempLR = {}
-        for node1 in graph.nodes():
-            s = 0.0
-            for node2 in graph.nodes():
-                if node2 in graph.neighbors(node1):
-                    # graph.degree([node2])[node2] node2的度
-                    s += 1.0 / graph.degree([node2])[node2] * LR[node2]
-            tempLR[node1] = s
+        for (node1, node2) in edges:
+            if node1 not in tempLR.keys():
+                tempLR[node1] = 0
+                tempLR[node1] += 1.0 / graph.degree([node2])[node2] * LR[node2]
+            else:
+                tempLR[node1] += 1.0 / graph.degree([node2])[node2] * LR[node2]
+            if node2 not in tempLR.keys():
+                tempLR[node2] = 0
+                tempLR[node2] += 1.0 / graph.degree([node1])[node1] * LR[node1]
+            else:
+                tempLR[node2] += 1.0 / graph.degree([node1])[node1] * LR[node1]
         # 终止条件:LR值不再变化
         error = 0.0
         for n in tempLR.keys():
@@ -72,7 +76,7 @@ def similarity(graph, u, v):
     return up / down
 
 
-def CQ(C):
+def CQ(C,graph):
     '''
     社区的评价标准
     :param C: 输入社区
@@ -165,7 +169,7 @@ def LEDocnetPro(graph):
             Nr_new = copy.deepcopy(Nr)
             Nr_new.append(Bl_first[0])
 
-            if CQ(Nr_new) > CQ(Nr):
+            if CQ(Nr_new,graph) > CQ(Nr,graph):
                 C.append(Bl_first[0])
             # else:
             #     # 论文中阐述如果隶属度最大的点不具备加入初始社区的条件则不对其余节点进行计算
@@ -196,9 +200,11 @@ if __name__ == "__main__":
     path2 = "data/RealNet/polbooks.gml"  # 104个节点
     path3 = "data/RealNet/football.gml"  # 114个节点
     path4 = "data/RealNet/netscience.gml"  # 1490个节点
-    path5 = "data/benchmark/network.dat"  # 人工生成网络
+    path5 = "data/GNBenchmark/communityGN9.dat"  # 人工生成网络
+    path6 = "data/GNBenchmark/networkGN9.dat"  # 人工生成网络
 
-    graph = nx.read_gml(path2)
+    graph = nx.read_gml(path0)
+    # graph = nx.read_adjlist(path6)
     nodes = graph.nodes()
     node_num = graph.number_of_nodes()  # 节点数
     edge_num = graph.number_of_edges()  # 边数
@@ -207,6 +213,10 @@ if __name__ == "__main__":
     A = np.array(nx.adjacency_matrix(graph).todense())  # 获取图邻接矩阵
     # 执行社区发现算法
     Communities = LEDocnetPro(graph)
+    # # benchmark生成网络的节点所属社区列表
+    # bench = dd.transDatToList(path5)
+    # # 社区评价公式（还未解决图邻接矩阵索引必须是整数的问题）
+    # print("NMI=", nmi.calc_overlap_nmi(node_num, Communities, bench))
     print("社区评价标准：")
     print("模块度Q = ", evaluation.Modularity(Communities, edge_num, degrees, edges))
     print("改进模块度EQ = ", evaluation.ExtendQ(Communities, edge_num, degrees, edges))

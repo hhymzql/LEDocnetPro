@@ -74,7 +74,7 @@ def Qov_adv(C, nodes, n, m, degrees, A):
     :param C: 社区划分结果 二维数组
     :param nodes: 顶点集
     :param m: 总边数
-    :param graph:图
+    :param n:节点数
     :return: Qov
     '''
     Qov = 0.0
